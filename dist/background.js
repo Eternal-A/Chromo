@@ -81,38 +81,57 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/options/index.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/background/index.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/options/index.ts":
-/*!******************************!*\
-  !*** ./src/options/index.ts ***!
-  \******************************/
+/***/ "./src/background/index.ts":
+/*!*********************************!*\
+  !*** ./src/background/index.ts ***!
+  \*********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var page = document.getElementById('buttonDiv');
-if (page) {
-    var kButtonColors = ['#3aa757', '#e8453c', '#f9bb2d', '#4688f1'];
-    var _loop_1 = function (item) {
-        var button = document.createElement('button');
-        button.style.backgroundColor = item;
-        button.addEventListener('click', function () {
-            chrome.storage.sync.set({ color: item }, function () {
-                console.log("color is " + item);
+chrome.runtime.onInstalled.addListener(function () {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
+        chrome.declarativeContent.onPageChanged.addRules([{
+                conditions: [new chrome.declarativeContent.PageStateMatcher({
+                        pageUrl: {
+                            hostContains: '',
+                        },
+                    })],
+                actions: [
+                    new chrome.declarativeContent.ShowPageAction(),
+                ],
+            }]);
+    });
+});
+var TabList = [];
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (TabList.some(function (v) { return v === tabId; })) {
+        if (changeInfo.status === 'complete') {
+            var temp_1 = [];
+            TabList.forEach(function (v) {
+                if (v === tabId) {
+                    return;
+                }
+                temp_1.push(v);
             });
-        });
-        page.appendChild(button);
-    };
-    for (var _i = 0, kButtonColors_1 = kButtonColors; _i < kButtonColors_1.length; _i++) {
-        var item = kButtonColors_1[_i];
-        _loop_1(item);
+            TabList = temp_1;
+        }
+        return;
     }
-}
+    TabList.push(tabId);
+    var isChrome = tab.url.match(/^chrome/);
+    if (!isChrome) {
+        chrome.tabs.executeScript(tabId, {
+            file: 'content.js',
+        });
+    }
+});
 
 
 /***/ })

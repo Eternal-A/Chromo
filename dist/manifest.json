@@ -3,9 +3,18 @@
     "name": "Chromo",
     "version": "1.0.0",
     "description": "Chrome Extension",
-    "permissions": ["storage", "declarativeContent", "activeTab", "tabs"],
+    "permissions": [
+        "storage",
+        "declarativeContent",
+        "activeTab",
+        "tabs",
+        "http://*/*",
+        "https://*/*"
+    ],
     "background": {
-        "scripts": ["dist/background.js"],
+        "scripts": [
+            "background.js"
+        ],
         "presistent": false
     },
     "options_page": "public/options.html",
@@ -23,5 +32,8 @@
         "32": "public/images/get_started32.png",
         "48": "public/images/get_started48.png",
         "128": "public/images/get_started128.png"
-    }
+    },
+    "web_accessible_resources": [
+        "inject.js"
+    ]
 }

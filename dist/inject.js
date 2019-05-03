@@ -81,38 +81,32 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/options/index.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/inject/index.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/options/index.ts":
-/*!******************************!*\
-  !*** ./src/options/index.ts ***!
-  \******************************/
+/***/ "./src/inject/index.ts":
+/*!*****************************!*\
+  !*** ./src/inject/index.ts ***!
+  \*****************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var page = document.getElementById('buttonDiv');
-if (page) {
-    var kButtonColors = ['#3aa757', '#e8453c', '#f9bb2d', '#4688f1'];
-    var _loop_1 = function (item) {
-        var button = document.createElement('button');
-        button.style.backgroundColor = item;
-        button.addEventListener('click', function () {
-            chrome.storage.sync.set({ color: item }, function () {
-                console.log("color is " + item);
-            });
-        });
-        page.appendChild(button);
-    };
-    for (var _i = 0, kButtonColors_1 = kButtonColors; _i < kButtonColors_1.length; _i++) {
-        var item = kButtonColors_1[_i];
-        _loop_1(item);
+window.removeByClass = function (pattern) {
+    var list = document.getElementsByClassName(pattern);
+    if (list.length > 1) {
+        console.log('class name matches more than one class!');
+        return;
     }
-}
+    if (list.length === 0) {
+        console.log('class name matches zero class!');
+        return;
+    }
+    list[0].remove();
+};
 
 
 /***/ })
