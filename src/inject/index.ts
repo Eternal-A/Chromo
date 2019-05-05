@@ -1,42 +1,42 @@
-interface IHandler {
-    init(): void;
-}
+import { IHandler } from './type';
+import { URL } from './decorator';
 
-type HandlerConstructor = {
-    new (...args: any[]): IHandler;
-}
+export const HandlerList: {
+    host: RegExp | string,
+    path: RegExp | string,
+    handler: IHandler,
+}[] = [];
 
-const handlers: {
-    [key: string]: IHandler;
-} = {};
-
-function Path(pattern: string) {
-    function decorator<T extends HandlerConstructor>(target: T) {
-        handlers[pattern] = new target;
-        return target;
-    }
-    return decorator;
-}
-
-@Path('^https://j.*')
-class A implements IHandler {
+@URL(/j/)
+class Test implements IHandler {
     init() {
-        console.log('j matches!');
+        console.log('Hello Chrome');
     }
 }
 
-@Path('^https://w.*')
-class B implements IHandler {
-    init() {
-        console.log('w matches!');
+function start() {
+    const url = document.URL;
+    const host = url.replace(/^https?:\/\//, '').replace(/\/.*/, '');
+    const path = url.replace(/^https?:\/\//, '').replace(/^[^\/]*/, '');
+    console.log(host, path);
+    for (let i = 0; i < HandlerList.length; i++) {
+        const handler = HandlerList[i];
+        let hostMatch = false;
+        let pathMatch = false;
+        if (typeof handler.host === "string") {
+            hostMatch = host == handler.host;
+        } else {
+            hostMatch = host.match(handler.host) !== null;
+        }
+        if (typeof handler.path === "string") {
+            pathMatch = path == handler.path;
+        } else {
+            pathMatch = path.match(handler.path) !== null;
+        }
+        if (hostMatch && pathMatch) {
+            handler.handler.init();
+        }
     }
 }
 
-const url = document.URL;
-
-for(const key in handlers) {
-    const reg = new RegExp(key);
-    if (url.match(reg)) {
-        handlers[key].init();
-    }
-}
+start();

@@ -8,6 +8,9 @@ module.exports = {
         inject: './src/inject/index.ts',
         content: './src/content/index.ts',
     },
+    resolve: {
+        extensions: ['.js', '.ts'],
+    },
     module: {
         rules: [{
             test: /\.ts$/,

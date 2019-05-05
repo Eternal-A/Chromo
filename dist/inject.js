@@ -86,6 +86,34 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/inject/decorator.ts":
+/*!*********************************!*\
+  !*** ./src/inject/decorator.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var index_1 = __webpack_require__(/*! ./index */ "./src/inject/index.ts");
+function URL(host, path) {
+    if (host === void 0) { host = /.*/; }
+    if (path === void 0) { path = /.*/; }
+    return function (target) {
+        index_1.HandlerList.push({
+            host: host,
+            path: path,
+            handler: new target(),
+        });
+        return target;
+    };
+}
+exports.URL = URL;
+
+
+/***/ }),
+
 /***/ "./src/inject/index.ts":
 /*!*****************************!*\
   !*** ./src/inject/index.ts ***!
@@ -101,43 +129,47 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var handlers = {};
-function Path(pattern) {
-    function decorator(target) {
-        handlers[pattern] = new target;
-        return target;
+Object.defineProperty(exports, "__esModule", { value: true });
+var decorator_1 = __webpack_require__(/*! ./decorator */ "./src/inject/decorator.ts");
+exports.HandlerList = [];
+var Test = /** @class */ (function () {
+    function Test() {
     }
-    return decorator;
-}
-var A = /** @class */ (function () {
-    function A() {
-    }
-    A.prototype.init = function () {
-        console.log('j matches!');
+    Test.prototype.init = function () {
+        console.log('Hello Chrome');
     };
-    A = __decorate([
-        Path('^https://j.*')
-    ], A);
-    return A;
+    Test = __decorate([
+        decorator_1.URL(/j/)
+    ], Test);
+    return Test;
 }());
-var B = /** @class */ (function () {
-    function B() {
-    }
-    B.prototype.init = function () {
-        console.log('w matches!');
-    };
-    B = __decorate([
-        Path('^https://w.*')
-    ], B);
-    return B;
-}());
-var url = document.URL;
-for (var key in handlers) {
-    var reg = new RegExp(key);
-    if (url.match(reg)) {
-        handlers[key].init();
+function start() {
+    var url = document.URL;
+    var host = url.replace(/^https?:\/\//, '').replace(/\/.*/, '');
+    var path = url.replace(/^https?:\/\//, '').replace(/^[^\/]*/, '');
+    console.log(host, path);
+    for (var i = 0; i < exports.HandlerList.length; i++) {
+        var handler = exports.HandlerList[i];
+        var hostMatch = false;
+        var pathMatch = false;
+        if (typeof handler.host === "string") {
+            hostMatch = host == handler.host;
+        }
+        else {
+            hostMatch = host.match(handler.host) !== null;
+        }
+        if (typeof handler.path === "string") {
+            pathMatch = path == handler.path;
+        }
+        else {
+            pathMatch = path.match(handler.path) !== null;
+        }
+        if (hostMatch && pathMatch) {
+            handler.handler.init();
+        }
     }
 }
+start();
 
 
 /***/ })
