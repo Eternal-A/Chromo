@@ -1,12 +1,42 @@
-(window as any).removeByClass = (pattern: string) => {
-    const list = document.getElementsByClassName(pattern);
-    if (list.length > 1) {
-        console.log('class name matches more than one class!');
-        return;
+interface IHandler {
+    init(): void;
+}
+
+type HandlerConstructor = {
+    new (...args: any[]): IHandler;
+}
+
+const handlers: {
+    [key: string]: IHandler;
+} = {};
+
+function Path(pattern: string) {
+    function decorator<T extends HandlerConstructor>(target: T) {
+        handlers[pattern] = new target;
+        return target;
     }
-    if (list.length === 0) {
-        console.log('class name matches zero class!');
-        return;
+    return decorator;
+}
+
+@Path('^https://j.*')
+class A implements IHandler {
+    init() {
+        console.log('j matches!');
     }
-    list[0].remove();
+}
+
+@Path('^https://w.*')
+class B implements IHandler {
+    init() {
+        console.log('w matches!');
+    }
+}
+
+const url = document.URL;
+
+for(const key in handlers) {
+    const reg = new RegExp(key);
+    if (url.match(reg)) {
+        handlers[key].init();
+    }
 }

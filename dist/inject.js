@@ -95,18 +95,49 @@
 
 "use strict";
 
-window.removeByClass = function (pattern) {
-    var list = document.getElementsByClassName(pattern);
-    if (list.length > 1) {
-        console.log('class name matches more than one class!');
-        return;
-    }
-    if (list.length === 0) {
-        console.log('class name matches zero class!');
-        return;
-    }
-    list[0].remove();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var handlers = {};
+function Path(pattern) {
+    function decorator(target) {
+        handlers[pattern] = new target;
+        return target;
+    }
+    return decorator;
+}
+var A = /** @class */ (function () {
+    function A() {
+    }
+    A.prototype.init = function () {
+        console.log('j matches!');
+    };
+    A = __decorate([
+        Path('^https://j.*')
+    ], A);
+    return A;
+}());
+var B = /** @class */ (function () {
+    function B() {
+    }
+    B.prototype.init = function () {
+        console.log('w matches!');
+    };
+    B = __decorate([
+        Path('^https://w.*')
+    ], B);
+    return B;
+}());
+var url = document.URL;
+for (var key in handlers) {
+    var reg = new RegExp(key);
+    if (url.match(reg)) {
+        handlers[key].init();
+    }
+}
 
 
 /***/ })
