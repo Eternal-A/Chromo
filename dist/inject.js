@@ -131,6 +131,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var decorator_1 = __webpack_require__(/*! ./decorator */ "./src/inject/decorator.ts");
+var util_1 = __webpack_require__(/*! ./util */ "./src/inject/util.ts");
 exports.HandlerList = [];
 var Test = /** @class */ (function () {
     function Test() {
@@ -144,10 +145,7 @@ var Test = /** @class */ (function () {
     return Test;
 }());
 function start() {
-    var url = document.URL;
-    var host = url.replace(/^https?:\/\//, '').replace(/\/.*/, '');
-    var path = url.replace(/^https?:\/\//, '').replace(/^[^\/]*/, '');
-    console.log(host, path);
+    var _a = util_1.resovleURL(document.URL), host = _a.host, path = _a.path;
     for (var i = 0; i < exports.HandlerList.length; i++) {
         var handler = exports.HandlerList[i];
         var hostMatch = false;
@@ -170,6 +168,27 @@ function start() {
     }
 }
 start();
+
+
+/***/ }),
+
+/***/ "./src/inject/util.ts":
+/*!****************************!*\
+  !*** ./src/inject/util.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function resovleURL(url) {
+    var temp = url.replace(/^https?:\/\//, '');
+    var host = temp.replace(/\/.*$/, '');
+    var path = temp.replace(/^[^\/]*/, '');
+    return { host: host, path: path };
+}
+exports.resovleURL = resovleURL;
 
 
 /***/ })

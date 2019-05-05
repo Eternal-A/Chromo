@@ -1,5 +1,6 @@
 import { IHandler } from './type';
 import { URL } from './decorator';
+import { resovleURL } from './util';
 
 export const HandlerList: {
     host: RegExp | string,
@@ -15,10 +16,7 @@ class Test implements IHandler {
 }
 
 function start() {
-    const url = document.URL;
-    const host = url.replace(/^https?:\/\//, '').replace(/\/.*/, '');
-    const path = url.replace(/^https?:\/\//, '').replace(/^[^\/]*/, '');
-    console.log(host, path);
+    const { host, path } = resovleURL(document.URL);
     for (let i = 0; i < HandlerList.length; i++) {
         const handler = HandlerList[i];
         let hostMatch = false;
