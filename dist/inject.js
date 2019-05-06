@@ -96,12 +96,12 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = __webpack_require__(/*! ./index */ "./src/inject/index.ts");
-function URL(host, path) {
+exports.HandlerList = [];
+function Inject(host, path) {
     if (host === void 0) { host = /.*/; }
     if (path === void 0) { path = /.*/; }
     return function (target) {
-        index_1.HandlerList.push({
+        exports.HandlerList.push({
             host: host,
             path: path,
             handler: new target(),
@@ -109,15 +109,15 @@ function URL(host, path) {
         return target;
     };
 }
-exports.URL = URL;
+exports.Inject = Inject;
 
 
 /***/ }),
 
-/***/ "./src/inject/index.ts":
-/*!*****************************!*\
-  !*** ./src/inject/index.ts ***!
-  \*****************************/
+/***/ "./src/inject/domain.ts":
+/*!******************************!*\
+  !*** ./src/inject/domain.ts ***!
+  \******************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -131,38 +131,59 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var decorator_1 = __webpack_require__(/*! ./decorator */ "./src/inject/decorator.ts");
-var util_1 = __webpack_require__(/*! ./util */ "./src/inject/util.ts");
-exports.HandlerList = [];
-var Test = /** @class */ (function () {
-    function Test() {
+function removeByClass(pattern, count) {
+    if (count === void 0) { count = 0; }
+    var elements = document.getElementsByClassName(pattern);
+    if (elements.length === 0 && count !== 0) {
+        setTimeout(function () { return removeByClass(pattern, count); }, 200);
+        return;
     }
-    Test.prototype.init = function () {
-        console.log('Hello Chrome');
+    console.log("remove " + elements.length + " element(s) by class: [" + pattern + "].");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].remove();
+    }
+    if (count - elements.length > 0) {
+        setTimeout(function () { return removeByClass(pattern, count - elements.length); }, 200);
+        return;
+    }
+}
+var JueJin = /** @class */ (function () {
+    function JueJin() {
+    }
+    JueJin.prototype.init = function () {
+        removeByClass('sidebar-block app-download-sidebar-block shadow');
+        removeByClass('sidebar-entry shadow', 3);
+        removeByClass('sidebar-block wechat-sidebar-block pure');
+        removeByClass('index-book-collect');
     };
-    Test = __decorate([
-        decorator_1.URL(/j/)
-    ], Test);
-    return Test;
+    JueJin = __decorate([
+        decorator_1.Inject('juejin.im')
+    ], JueJin);
+    return JueJin;
 }());
+
+
+/***/ }),
+
+/***/ "./src/inject/index.ts":
+/*!*****************************!*\
+  !*** ./src/inject/index.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var decorator_1 = __webpack_require__(/*! ./decorator */ "./src/inject/decorator.ts");
+var util_1 = __webpack_require__(/*! ./util */ "./src/inject/util.ts");
+__webpack_require__(/*! ./domain */ "./src/inject/domain.ts");
 function start() {
     var _a = util_1.resovleURL(document.URL), host = _a.host, path = _a.path;
-    for (var i = 0; i < exports.HandlerList.length; i++) {
-        var handler = exports.HandlerList[i];
-        var hostMatch = false;
-        var pathMatch = false;
-        if (typeof handler.host === "string") {
-            hostMatch = host == handler.host;
-        }
-        else {
-            hostMatch = host.match(handler.host) !== null;
-        }
-        if (typeof handler.path === "string") {
-            pathMatch = path == handler.path;
-        }
-        else {
-            pathMatch = path.match(handler.path) !== null;
-        }
-        if (hostMatch && pathMatch) {
+    for (var i = 0; i < decorator_1.HandlerList.length; i++) {
+        var handler = decorator_1.HandlerList[i];
+        if (util_1.match(host, handler.host) && util_1.match(path, handler.path)) {
+            console.log('Chromo Inject!');
             handler.handler.init();
         }
     }
@@ -189,6 +210,13 @@ function resovleURL(url) {
     return { host: host, path: path };
 }
 exports.resovleURL = resovleURL;
+function match(to, pattern) {
+    if (typeof pattern === 'string') {
+        return to === pattern;
+    }
+    return to.match(pattern) !== null;
+}
+exports.match = match;
 
 
 /***/ })

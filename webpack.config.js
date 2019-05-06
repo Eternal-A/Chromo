@@ -14,10 +14,7 @@ module.exports = {
     module: {
         rules: [{
             test: /\.ts$/,
-            use: [
-                'ts-loader',
-                path.resolve(__dirname, './loader/index.js'),
-            ],
+            use: 'ts-loader',
         }],
     },
     output: {
